@@ -46,9 +46,15 @@ UPDATE allowed_users SET chip_color = '#8e24aa' WHERE show_name = '成員D';
 
    例：帳號 `bear5426681`、倉庫 `meal` → `https://bear5426681.github.io/meal/#/`
 
-6. Supabase → **Authentication** → **URL Configuration** → **Redirect URLs** 加入：
+6. Supabase → **Authentication** → **URL Configuration**
 
-   `https://<user>.github.io/<repo>/#/`
+   - **Site URL**（最重要，手機登入後若跳到 `localhost:9000` 幾乎都是這裡設錯）：
+     `https://bear5426681.github.io/meal-calendar/`
+   - **Redirect URLs**（列表內全部允許，勾選是用來刪除，不是啟用）：
+     - `https://bear5426681.github.io/meal-calendar/`
+     - `https://bear5426681.github.io/meal-calendar/#/`
+     - 本機開發才加：`http://localhost:5174/`、`http://localhost:5174/#/`
+   - 若不用本機測試，可**刪除** `localhost:9000` 相關網址，避免手機誤導向。
 
 ### CI 若 npm 依賴衝突
 

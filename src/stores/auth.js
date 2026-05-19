@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from 'boot/supabase'
 import { handleOAuthRedirect } from 'src/utils/authRedirect'
+import { getOAuthRedirectUrl, fixProductionRedirectLeak } from 'src/utils/appBase'
 
 let authListenerRegistered = false
 
@@ -51,16 +52,19 @@ export const useAuthStore = defineStore('auth', () => {
         supabase.auth.onAuthStateChange(async (_event, s) => {
           session.value = s
           await refreshAllowed()
+          if (_event === 'SIGNED_IN') {
+            fixProductionRedirectLeak()
+          }
         })
       }
+      fixProductionRedirectLeak()
     } finally {
       loading.value = false
     }
   }
 
   async function signInWithGoogle () {
-    // 勿帶 #/，避免回傳變成 /#/#access_token=...
-    const redirectTo = `${window.location.origin}${import.meta.env.BASE_URL || '/'}`.replace(/#.*$/, '').replace(/\/?$/, '/')
+    const redirectTo = getOAuthRedirectUrl()
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo }

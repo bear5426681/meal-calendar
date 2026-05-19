@@ -1,6 +1,11 @@
 import { supabase } from 'boot/supabase'
+import {
+  getAppEntryUrl,
+  getAppBasePath,
+  fixProductionRedirectLeak,
+  isProductionHost
+} from 'src/utils/appBase'
 
-/** 從網址任意位置擷取 OAuth token（含 /#/#access_token= 雙 hash） */
 function parseTokensFromUrl () {
   const href = window.location.href
   const hash = window.location.hash || ''
@@ -19,12 +24,12 @@ function parseTokensFromUrl () {
     }
   }
 
-  // hash: #access_token= 或 #/#access_token= 或 #/access_token=
   if (hash.includes('access_token')) {
     const normalized = hash.replace(/^#\/?\/?/, '')
-    const params = new URLSearchParams(
-      normalized.startsWith('access_token') ? normalized : normalized.slice(normalized.indexOf('access_token'))
-    )
+    const qs = normalized.startsWith('access_token')
+      ? normalized
+      : normalized.slice(normalized.indexOf('access_token'))
+    const params = new URLSearchParams(qs)
     const access_token = params.get('access_token')
     const refresh_token = params.get('refresh_token')
     if (access_token && refresh_token) {
@@ -35,45 +40,66 @@ function parseTokensFromUrl () {
   return null
 }
 
+export function hasAuthFragmentInUrl () {
+  return /access_token=|refresh_token=|code=|error=/.test(window.location.href)
+}
+
 export function cleanAuthUrl () {
-  const base = `${window.location.origin}${window.location.pathname}`
-  const clean = `${base.replace(/\/$/, '')}/#/`
+  const clean = getAppEntryUrl()
   if (window.location.href !== clean) {
     window.history.replaceState(null, '', clean)
   }
 }
 
-export function hasAuthFragmentInUrl () {
-  const h = window.location.href
-  return /access_token=|refresh_token=|code=|error=/.test(h)
+function isWrongOAuthLanding () {
+  const base = getAppBasePath()
+  if (base === '/') return false
+  const onSiteRoot =
+    window.location.pathname === '/' || window.location.pathname === ''
+  return onSiteRoot && hasAuthFragmentInUrl()
 }
 
-/** OAuth 回傳與 Vue hash router 衝突時，手動還原 session 並清網址 */
+async function applyParsedSession (parsed) {
+  if (parsed.type === 'code') {
+    const { error } = await supabase.auth.exchangeCodeForSession(parsed.code)
+    if (error) throw error
+  } else {
+    const { error } = await supabase.auth.setSession({
+      access_token: parsed.access_token,
+      refresh_token: parsed.refresh_token
+    })
+    if (error) throw error
+  }
+}
+
 export async function handleOAuthRedirect () {
   if (typeof window === 'undefined') return false
 
   const parsed = parseTokensFromUrl()
   if (!parsed) {
     if (hasAuthFragmentInUrl()) cleanAuthUrl()
+    fixProductionRedirectLeak()
     return false
   }
 
   try {
-    if (parsed.type === 'code') {
-      const { error } = await supabase.auth.exchangeCodeForSession(parsed.code)
-      if (error) throw error
-    } else {
-      const { error } = await supabase.auth.setSession({
-        access_token: parsed.access_token,
-        refresh_token: parsed.refresh_token
-      })
-      if (error) throw error
+    await applyParsedSession(parsed)
+
+    if (isWrongOAuthLanding()) {
+      window.location.replace(getAppEntryUrl())
+      return true
     }
+
     cleanAuthUrl()
+    fixProductionRedirectLeak()
     return true
   } catch (e) {
     console.error('[auth] OAuth redirect failed', e)
-    cleanAuthUrl()
+    if (isWrongOAuthLanding() || isProductionHost()) {
+      window.location.replace(getAppEntryUrl())
+    } else {
+      cleanAuthUrl()
+    }
     return false
   }
 }

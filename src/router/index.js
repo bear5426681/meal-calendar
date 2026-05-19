@@ -6,7 +6,7 @@ export default function () {
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,
-    history: createWebHashHistory()
+    history: createWebHashHistory(import.meta.env.BASE_URL)
   })
 
   Router.beforeEach(async (to) => {
