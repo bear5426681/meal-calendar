@@ -1,0 +1,137 @@
+body
+  font-family: 'Roboto', 'Noto Sans TC', sans-serif
+  background: #f5f5f5
+
+.meal-page
+  max-width: 480px
+  margin: 0 auto
+
+.calendar-week
+  display: grid
+  column-gap: 3px
+  margin-bottom: 3px
+
+  &--header
+    margin-bottom: 6px
+
+.calendar-week__day
+  min-width: 0
+
+  &--pad
+    visibility: hidden
+    min-height: 72px
+
+  &--header
+    text-align: center
+    min-height: auto
+    height: auto
+    padding-bottom: 2px
+
+.calendar-week--header .day-label-weekend
+  color: #c62828
+  font-weight: 700
+
+.day-cell
+  border-radius: 8px
+  background: #fff
+  border: 1px solid #e0e0e0
+  height: 72px
+  padding: 4px 5px
+  display: flex
+  flex-direction: column
+  overflow: hidden
+  box-sizing: border-box
+
+.day-cell--today
+  border: 2px solid #91cfc9
+  box-shadow: 0 0 0 1px rgba(0, 137, 123, 0.25)
+
+.day-header--today .day-num
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  min-width: 18px
+  height: 18px
+  padding: 0 4px
+  border-radius: 9px
+  background: #91cfc9
+  color: #fff !important
+
+.day-cell--drop-target
+  outline: 2px dashed #26a69a
+  background: #e0f2f1
+
+.day-header
+  display: flex
+  flex-direction: row
+  align-items: baseline
+  gap: 3px
+  min-width: 0
+  white-space: nowrap
+  overflow: hidden
+  line-height: 1.2
+  margin-bottom: 2px
+
+.day-num
+  font-size: 11px
+  font-weight: 700
+  flex-shrink: 0
+  color: #616161
+
+.day-desc
+  font-size: 10px
+  overflow: hidden
+  text-overflow: ellipsis
+  min-width: 0
+  flex: 1 1 auto
+
+.day-header--weekend .day-num
+  color: #c62828
+
+.day-header--holiday .day-desc
+  color: #e65100
+  font-weight: 600
+
+.day-header--weekend:not(.day-header--holiday) .day-num
+  color: #c62828
+
+.day-body
+  flex: 1 1 auto
+  min-height: 0
+  display: flex
+  flex-direction: column
+  justify-content: flex-start
+  gap: 2px
+  overflow: hidden
+
+.day-body__row
+  min-width: 0
+
+.assignee-chip
+  display: inline-block
+  max-width: 100%
+  padding: 1px 6px
+  border-radius: 10px
+  font-size: 11px
+  font-weight: 600
+  cursor: grab
+  user-select: none
+  touch-action: none
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
+  vertical-align: top
+
+.assignee-chip--dragging
+  opacity: 0.5
+
+.meal-line
+  font-size: 10px
+  line-height: 1.25
+  color: #424242
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
+
+.meal-line--muted
+  color: #757575
