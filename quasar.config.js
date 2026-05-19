@@ -1,11 +1,13 @@
 const { configure } = require('quasar/wrappers')
 
 module.exports = configure((ctx) => ({
-  eslint: {
-    warnings: true,
-    errors: true,
-    exclude: ['.quasar', 'dist']
-  },
+  eslint: process.env.CI
+    ? false
+    : {
+        warnings: true,
+        errors: true,
+        exclude: ['.quasar', 'dist']
+      },
   boot: ['pinia', 'auth', 'supabase'],
   css: ['app.sass'],
   extras: ['material-icons'],

@@ -32,9 +32,27 @@ UPDATE allowed_users SET chip_color = '#8e24aa' WHERE show_name = '成員D';
 
 ## GitHub Pages
 
-- Repository Settings → Pages → Source: **GitHub Actions**
-- Secrets：`VITE_SUPABASE_URL`、`VITE_SUPABASE_ANON_KEY`
-- Supabase Auth → Redirect URLs：`http://localhost:5174/#/`、`https://<user>.github.io/<repo>/#/`
+### 第一次設定
+
+1. GitHub 倉庫 → **Settings** → **Pages** → **Build and deployment**
+2. **Source** 選 **GitHub Actions**（不要選 Deploy from a branch）
+3. **Settings** → **Secrets and variables** → **Actions** → 新增：
+   - `VITE_SUPABASE_URL`（例：`https://xxxx.supabase.co`）
+   - `VITE_SUPABASE_ANON_KEY`（Supabase 的 anon / publishable key）
+4. 推送至 `main` 後，到 **Actions** 分頁確認 workflow「Deploy to GitHub Pages」成功（綠色勾）
+5. 開啟網址（將 `<user>`、`<repo>` 換成你的）：
+
+   `https://<user>.github.io/<repo>/#/`
+
+   例：帳號 `bear5426681`、倉庫 `meal` → `https://bear5426681.github.io/meal/#/`
+
+6. Supabase → **Authentication** → **URL Configuration** → **Redirect URLs** 加入：
+
+   `https://<user>.github.io/<repo>/#/`
+
+### CI 若 npm 依賴衝突
+
+專案已含 `.npmrc`（`legacy-peer-deps=true`），與本機 `npm install` 行為一致。
 
 ## 假日 JSON
 
