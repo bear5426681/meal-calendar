@@ -2,7 +2,7 @@
   <q-layout view="hHh lpR fFf">
     <q-header elevated class="bg-teal-7">
       <q-toolbar>
-        <q-toolbar-title>伙食責任表</q-toolbar-title>
+        <q-toolbar-title>吃🐻🌳🐻🌳🐻飯</q-toolbar-title>
         <q-space />
         <span v-if="auth.isLoggedIn" class="user-label q-mr-xs">{{ auth.displayName }}</span>
         <q-btn
