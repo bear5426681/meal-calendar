@@ -56,6 +56,40 @@ body
   border: 2px solid #91cfc9
   box-shadow: 0 0 0 1px rgba(0, 137, 123, 0.25)
 
+.day-cell--selected:not(.day-cell--today)
+  border-color: #00897b
+  box-shadow: 0 0 0 1px rgba(0, 137, 123, 0.35)
+
+.day-cell--selected.day-cell--today
+  box-shadow: 0 0 0 2px rgba(0, 137, 123, 0.45)
+
+.day-detail
+  background: #fff
+
+.day-detail__row
+  display: flex
+  flex-wrap: wrap
+  align-items: center
+  gap: 8px
+
+  &--stack
+    flex-direction: column
+    align-items: flex-start
+
+.day-detail__text
+  font-size: 15px
+  line-height: 1.45
+  color: #212121
+  word-break: break-word
+
+  &--notes
+    white-space: pre-wrap
+
+.assignee-chip--detail
+  font-size: 14px
+  padding: 4px 12px
+  cursor: default
+
 .day-header--today .day-num
   display: inline-flex
   align-items: center

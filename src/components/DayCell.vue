@@ -3,6 +3,7 @@
     class="day-cell"
     :class="{
       'day-cell--today': isToday,
+      'day-cell--selected': isSelected,
       'day-cell--drop-target': isDropTarget
     }"
     @click.stop="onCellClick"
@@ -49,6 +50,7 @@ const props = defineProps({
   assigneeName: { type: String, default: '' },
   chipColor: { type: String, default: '#26a69a' },
   isToday: { type: Boolean, default: false },
+  isSelected: { type: Boolean, default: false },
   isDropTarget: { type: Boolean, default: false },
   canEdit: { type: Boolean, default: false }
 })

@@ -57,4 +57,7 @@ async function onLogout () {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.q-toolbar__title {
+    flex: 1 1 auto;
+}
 </style>

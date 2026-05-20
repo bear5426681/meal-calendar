@@ -38,10 +38,19 @@
         :month="viewMonth"
         :holidays="holidays"
         :drag-source="dragSource"
-        @open-day="openEditor"
+        :selected-date="selectedDate"
+        @open-day="onDayClick"
         @drop-day="onDropDay"
         @start-drag="dragSource = $event"
         @cancel-drag="dragSource = null"
+      />
+
+      <DayDetailPanel
+        ref="detailPanelRef"
+        :meal-date="selectedDate"
+        :holidays="holidays"
+        @edit="openEditorFromDetail"
+        @close="selectedDate = null"
       />
 
       <MealEditorDialog
@@ -57,13 +66,15 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useQuasar } from 'quasar'
 import { dayjs, toIsoDate } from 'src/utils/dates'
 import { useAuthStore } from 'stores/auth'
 import { useMealsStore } from 'stores/meals'
 import { useMembersStore } from 'stores/members'
+import { mealHasContent } from 'src/utils/meal'
 import MonthCalendar from 'components/MonthCalendar.vue'
+import DayDetailPanel from 'components/DayDetailPanel.vue'
 import MealEditorDialog from 'components/MealEditorDialog.vue'
 import StatsPanel from 'components/StatsPanel.vue'
 import LogDrawer from 'components/LogDrawer.vue'
@@ -78,6 +89,8 @@ const viewYear = ref(dayjs().year())
 const viewMonth = ref(dayjs().month() + 1)
 const editorOpen = ref(false)
 const editorDate = ref(null)
+const selectedDate = ref(null)
+const detailPanelRef = ref(null)
 const showLogs = ref(false)
 const dragSource = ref(null)
 
@@ -94,6 +107,9 @@ async function reload () {
   await meals.fetchMonth(viewYear.value, viewMonth.value)
   await meals.fetchYearStats(viewYear.value)
   dragSource.value = null
+  if (selectedDate.value && !mealHasContent(meals.mealForDate(dayjs(selectedDate.value)))) {
+    selectedDate.value = null
+  }
 }
 
 function prevMonth () {
@@ -108,8 +124,28 @@ function nextMonth () {
   viewMonth.value = d.month() + 1
 }
 
-function openEditor (date) {
-  editorDate.value = toIsoDate(date)
+async function scrollToDetail () {
+  await nextTick()
+  detailPanelRef.value?.$el?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' })
+}
+
+function onDayClick (date) {
+  const iso = toIsoDate(date)
+  const meal = meals.mealForDate(date)
+  if (mealHasContent(meal)) {
+    selectedDate.value = iso
+    editorOpen.value = false
+    scrollToDetail()
+    return
+  }
+  selectedDate.value = null
+  editorDate.value = iso
+  editorOpen.value = true
+}
+
+function openEditorFromDetail () {
+  if (!selectedDate.value) return
+  editorDate.value = selectedDate.value
   editorOpen.value = true
 }
 
@@ -136,6 +172,7 @@ async function onDropDay (targetDate) {
 }
 
 watch([viewYear, viewMonth], async () => {
+  selectedDate.value = null
   try {
     await reload()
   } catch (e) {

@@ -33,6 +33,7 @@
           :assignee-name="assigneeName(day)"
           :chip-color="chipColorFor(day)"
           :is-today="isToday(day)"
+          :is-selected="selectedDate === toIsoDate(day)"
           :is-drop-target="!!dragSource && dragSource !== toIsoDate(day)"
           :can-edit="canEdit"
           @click="$emit('open-day', day)"
@@ -58,7 +59,8 @@ const props = defineProps({
   year: { type: Number, required: true },
   month: { type: Number, required: true },
   holidays: { type: Array, default: () => [] },
-  dragSource: { type: String, default: null }
+  dragSource: { type: String, default: null },
+  selectedDate: { type: String, default: null }
 })
 
 defineEmits(['open-day', 'drop-day', 'start-drag', 'cancel-drag'])
